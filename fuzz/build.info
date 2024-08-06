@@ -9,7 +9,7 @@
 -}
 
 IF[{- !$disabled{"fuzz-afl"} || !$disabled{"fuzz-libfuzzer"} -}]
-  PROGRAMS{noinst}=asn1 asn1parse bignum bndiv client conf crl server smime
+  PROGRAMS{noinst}=asn1 asn1parse asn1_time_to_generalizedtime bignum bndiv client conf crl server smime
   PROGRAMS{noinst}=punycode pem decoder hashtable acert
   PROGRAMS{noinst}=v3name
   PROGRAMS{noinst}=provider
@@ -45,6 +45,10 @@ IF[{- !$disabled{"fuzz-afl"} || !$disabled{"fuzz-libfuzzer"} -}]
   SOURCE[asn1parse]=asn1parse.c driver.c
   INCLUDE[asn1parse]=../include {- $ex_inc -}
   DEPEND[asn1parse]=../libcrypto {- $ex_lib -}
+
+  SOURCE[asn1_time_to_generalizedtime]=asn1_time_to_generalizedtime.c driver.c
+  INCLUDE[asn1_time_to_generalizedtime]=../include {- $ex_inc -}
+  DEPEND[asn1_time_to_generalizedtime]=../libcrypto {- $ex_lib -}
 
   SOURCE[bignum]=bignum.c driver.c
   INCLUDE[bignum]=../include {- $ex_inc -}
