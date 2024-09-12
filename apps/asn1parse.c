@@ -127,8 +127,10 @@ int asn1parse_main(int argc, char **argv)
             dump = strtol(opt_arg(), NULL, 0);
             break;
         case OPT_STRPARSE:
-            if (sk_OPENSSL_STRING_push(osk, opt_arg()) <= 0)
+            if (!sk_OPENSSL_STRING_push(osk, opt_arg())) {
+                BIO_printf(bio_err, "Internal error");
                 goto end;
+            }
             break;
         case OPT_GENSTR:
             genstr = opt_arg();

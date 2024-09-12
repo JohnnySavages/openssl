@@ -135,12 +135,10 @@ int crl2pkcs7_main(int argc, char **argv)
         goto end;
 
     if (crl != NULL) {
-        if ((crl_stack = sk_X509_CRL_new_null()) == NULL)
+        if ((crl_stack = sk_X509_CRL_new_null()) == NULL ||
+            !sk_X509_CRL_push(crl_stack, crl))
             goto end;
         p7s->crl = crl_stack;
-
-        if (!sk_X509_CRL_push(crl_stack, crl))
-            goto end;
         crl = NULL;             /* now part of p7 for OPENSSL_freeing */
     }
 
@@ -175,6 +173,7 @@ int crl2pkcs7_main(int argc, char **argv)
     ret = 0;
  end:
     sk_OPENSSL_STRING_free(certflst);
+    sk_X509_CRL_free(crl_stack);
     BIO_free(in);
     BIO_free_all(out);
     PKCS7_free(p7);
