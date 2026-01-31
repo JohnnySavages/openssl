@@ -513,6 +513,8 @@ my %params = (
 
     'ENCODER_PARAM_CIPHER' =>           '*ALG_PARAM_CIPHER',
     'ENCODER_PARAM_PROPERTIES' =>       '*ALG_PARAM_PROPERTIES',
+    'PKEY_PARAM_ASN1_CMS_ENVELOPE_ENCRYPT' =>       'asn1-cms-envelope-encrypt',
+    'PKEY_PARAM_ASN1_CMS_ENVELOPE_DECRYPT' =>       'asn1-cms-envelope-decrypt',
 # Currently PVK only, but reusable for others as needed
     'ENCODER_PARAM_ENCRYPT_LEVEL' =>    "encrypt-level",
     'ENCODER_PARAM_SAVE_PARAMETERS' =>  "save-parameters",# integer

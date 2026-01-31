@@ -14,6 +14,7 @@
 #include <openssl/err.h>
 #include <openssl/cms.h>
 #include <openssl/evp.h>
+#include <openssl/core_names.h>
 #include "internal/sizes.h"
 #include "crypto/asn1.h"
 #include "crypto/evp.h"
@@ -131,17 +132,32 @@ int ossl_cms_env_asn1_ctrl(CMS_RecipientInfo *ri, int cmd)
     else if (EVP_PKEY_is_a(pkey, "RSA"))
         return ossl_cms_rsa_envelope(ri, cmd);
 
-    /* Something else? We'll give engines etc a chance to handle this */
-    if (pkey->ameth == NULL || pkey->ameth->pkey_ctrl == NULL)
-        return 1;
-    i = pkey->ameth->pkey_ctrl(pkey, ASN1_PKEY_CTRL_CMS_ENVELOPE, cmd, ri);
-    if (i == -2) {
-        ERR_raise(ERR_LIB_CMS, CMS_R_NOT_SUPPORTED_FOR_THIS_KEY_TYPE);
-        return 0;
-    }
-    if (i <= 0) {
-        ERR_raise(ERR_LIB_CMS, CMS_R_CTRL_FAILURE);
-        return 0;
+    /* Now give engines, providers, etc a chance to handle this */
+    if (pkey->ameth != NULL && pkey->ameth->pkey_ctrl != NULL) {
+        i = pkey->ameth->pkey_ctrl(pkey, ASN1_PKEY_CTRL_CMS_ENVELOPE, cmd, ri);
+        if (i == -2) {
+            ERR_raise(ERR_LIB_CMS, CMS_R_NOT_SUPPORTED_FOR_THIS_KEY_TYPE);
+            return 0;
+        }
+        if (i <= 0) {
+            ERR_raise(ERR_LIB_CMS, CMS_R_CTRL_FAILURE);
+            return 0;
+        }
+    } else {
+        // struct ossl_param_st {
+            //     const char *key;             /* the name of the parameter */
+            //     unsigned int data_type;      /* declare what kind of content is in buffer */
+            //     void *data;                  /* value being passed in or out */
+            //     size_t data_size;            /* data size */
+            //     size_t return_size;          /* returned content size */
+            // };
+        OSSL_PARAM params[2] = { {(cmd) ? OSSL_PKEY_PARAM_ASN1_CMS_ENVELOPE_DECRYPT : OSSL_PKEY_PARAM_ASN1_CMS_ENVELOPE_ENCRYPT, OSSL_PARAM_PTR, ri, sizeof(ri), OSSL_PARAM_UNMODIFIED},
+                                 OSSL_PARAM_END };
+
+        if (!EVP_PKEY_set_params(pkey, params)) {
+            ERR_raise(ERR_LIB_CMS, CMS_R_NOT_SUPPORTED_FOR_THIS_KEY_TYPE);
+            return 0;
+        }
     }
     return 1;
 }
