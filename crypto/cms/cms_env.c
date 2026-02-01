@@ -111,11 +111,13 @@ cms_auth_enveloped_data_init(CMS_ContentInfo *cms)
 int ossl_cms_env_asn1_ctrl(CMS_RecipientInfo *ri, int cmd)
 {
     EVP_PKEY *pkey;
+    EVP_PKEY_CTX *pctx;
     int i;
-    if (ri->type == CMS_RECIPINFO_TRANS)
+    if (ri->type == CMS_RECIPINFO_TRANS) {
         pkey = ri->d.ktri->pkey;
-    else if (ri->type == CMS_RECIPINFO_AGREE) {
-        EVP_PKEY_CTX *pctx = ri->d.kari->pctx;
+        pctx = ri->d.ktri->pctx;
+    } else if (ri->type == CMS_RECIPINFO_AGREE) {
+        pctx = ri->d.kari->pctx;
 
         if (pctx == NULL)
             return 0;
@@ -154,10 +156,11 @@ int ossl_cms_env_asn1_ctrl(CMS_RecipientInfo *ri, int cmd)
         OSSL_PARAM params[2] = { {(cmd) ? OSSL_PKEY_PARAM_ASN1_CMS_ENVELOPE_DECRYPT : OSSL_PKEY_PARAM_ASN1_CMS_ENVELOPE_ENCRYPT, OSSL_PARAM_PTR, ri, sizeof(ri), OSSL_PARAM_UNMODIFIED},
                                  OSSL_PARAM_END };
 
-        if (!EVP_PKEY_set_params(pkey, params)) {
+        if (!EVP_PKEY_CTX_set_params(pctx, params)) {
             ERR_raise(ERR_LIB_CMS, CMS_R_NOT_SUPPORTED_FOR_THIS_KEY_TYPE);
             return 0;
         }
+
     }
     return 1;
 }
