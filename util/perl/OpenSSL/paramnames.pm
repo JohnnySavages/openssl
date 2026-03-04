@@ -160,6 +160,9 @@ my %params = (
     'CIPHER_PARAM_TLS1_MULTIBLOCK_ENC_IN' =>             "tls1multi_encin",     # octet_string
     'CIPHER_PARAM_TLS1_MULTIBLOCK_ENC_LEN' =>            "tls1multi_enclen",    # size_t
 
+    'CIPHER_PARAM_PROCESS_UNPROTECTED_ENCRYPT' =>        "unprotected_enc",     # ptr
+    'CIPHER_PARAM_PROCESS_UNPROTECTED_DECRYPT' =>        "unprotected_dec",     # ptr
+
 # digest parameters
     'DIGEST_PARAM_XOFLEN' =>       "xoflen",       # size_t
     'DIGEST_PARAM_SSL3_MS' =>      "ssl3-ms",      # octet string
